@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 
 @Service
-public class HearingYannyInterpreter {
+public class HearingYannyInterpreter implements IHearingInterpreter {
 	
 	private final IWordProducer wordProducer;
 
@@ -18,6 +18,7 @@ public class HearingYannyInterpreter {
 		this.wordProducer = wordProducer;
 	}
 
+	@Override
 	public String whatIHeard() {
 
 		String word = this.wordProducer.getWord();
