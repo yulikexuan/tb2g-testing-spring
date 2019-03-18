@@ -7,6 +7,7 @@ package org.springframework.samples.petclinic.sfg;
 import org.springframework.stereotype.Component;
 
 
+@Laurel
 @Component
 public class LaurelWordProducer implements IWordProducer {
 

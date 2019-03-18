@@ -1,4 +1,4 @@
-//: org.springframework.samples.petclinic.sfg.HearingInterpreterIT.java
+//: org.springframework.samples.petclinic.sfg.HearingInterpreterLaurelIT.java
 
 
 package org.springframework.samples.petclinic.sfg;
@@ -11,15 +11,14 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
 
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = {BaseConfig.class, LaurelConfig.class})
-public class HearingInterpreterIT {
+@ContextConfiguration(classes = {BaseConfig.class})
+public class HearingInterpreterLaurelIT {
 
 	@Autowired
-	private HearingInterpreter hearingInterpreter;
+	private HearingLaurelInterpreter hearingInterpreter;
 
 	@Test
 	public void testWhatIHeard() throws Exception {

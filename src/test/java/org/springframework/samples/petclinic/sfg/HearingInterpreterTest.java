@@ -12,11 +12,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class HearingInterpreterTest {
 
-	private HearingInterpreter hearingInterpreter;
+	private HearingLaurelInterpreter hearingInterpreter;
 
 	@Before
 	public void setUp() throws Exception {
-		this.hearingInterpreter = new HearingInterpreter(new LaurelWordProducer());
+		this.hearingInterpreter = new HearingLaurelInterpreter(new LaurelWordProducer());
 	}
 
 	@Test
