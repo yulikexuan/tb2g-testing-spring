@@ -10,11 +10,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.petclinic.sfg.AuditoryIllusion;
 import org.springframework.samples.petclinic.sfg.BaseConfig;
 import org.springframework.samples.petclinic.sfg.HearingLaurelInterpreter;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 
+@ActiveProfiles("baseConfig")
 @SpringJUnitConfig(classes = {BaseConfig.class})
 class HearingLaurelInterpreterIT {
 

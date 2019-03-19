@@ -1,4 +1,4 @@
-//: org.springframework.samples.petclinic.sfg.junit5.HearingYannyInterpreterIT.java
+//: org.springframework.samples.petclinic.sfg.junit5.HearingInterpreterActiveProfileIT.java
 
 
 
@@ -11,21 +11,23 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.petclinic.sfg.AuditoryIllusion;
 import org.springframework.samples.petclinic.sfg.BaseConfig;
-import org.springframework.samples.petclinic.sfg.HearingYannyInterpreter;
+import org.springframework.samples.petclinic.sfg.IHearingInterpreter;
+import org.springframework.samples.petclinic.sfg.Laurel;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 
 @ActiveProfiles("baseConfig")
 @SpringJUnitConfig(classes = {BaseConfig.class})
-class HearingYannyInterpreterIT {
+class HearingInterpreterActiveProfileIT {
 
+	@Laurel
 	@Autowired
-	private HearingYannyInterpreter interpreter;
+	private IHearingInterpreter interpreter;
 
 	@Test
 	void whatIHeard() {
-		assertThat(this.interpreter.whatIHeard()).as("Should be Yanny.")
-				.isEqualTo(AuditoryIllusion.YANNY.getWord());
+		assertThat(this.interpreter.whatIHeard()).as("Should be Laurel.")
+				.isEqualTo(AuditoryIllusion.LAUREL.getWord());
 	}
 }
