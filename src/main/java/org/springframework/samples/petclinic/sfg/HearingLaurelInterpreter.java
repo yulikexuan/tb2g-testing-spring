@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
+@Laurel
 @Service
 public class HearingLaurelInterpreter implements IHearingInterpreter {
 	
