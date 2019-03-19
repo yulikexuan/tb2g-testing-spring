@@ -13,12 +13,12 @@ import org.springframework.stereotype.Service;
 @Profile("expernalized")
 @Primary
 @Service
-public class HearingInterpreter implements IHearingInterpreter {
+public class ExternalizedHearingInterpreter implements IHearingInterpreter {
 	
 	private IWordProducer wordProducer;
 
 	@Autowired
-	public HearingInterpreter(@External IWordProducer wordProducer) {
+	public ExternalizedHearingInterpreter(@External IWordProducer wordProducer) {
 		super();
 		this.wordProducer = wordProducer;
 	}
