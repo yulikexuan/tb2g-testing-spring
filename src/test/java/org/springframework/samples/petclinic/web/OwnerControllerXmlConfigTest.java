@@ -4,17 +4,11 @@
 package org.springframework.samples.petclinic.web;
 
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.*;
-import static org.mockito.ArgumentMatchers.*;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.BDDMockito.*;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,7 +22,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.petclinic.model.Owner;
@@ -56,6 +49,12 @@ class OwnerControllerXmlConfigTest {
 	@Autowired
 	private OwnerController controller;
 
+	@Captor
+	private ArgumentCaptor<String> strArgCaptor;
+	
+	@Captor
+	private ArgumentCaptor<Owner> ownerArgCaptor;
+
 	private MockMvc mockMvc;
 	
 	@BeforeEach
@@ -72,6 +71,11 @@ class OwnerControllerXmlConfigTest {
 		this.mockMvc = MockMvcBuilders.standaloneSetup(this.controller).build();
 	}
 
+	@AfterEach
+	void tearDown() {
+		reset(service);
+	}
+	
 	@DisplayName("Able to initialize a creation form view with a default Owner - ")
 	@Test
 	void testInitCreationForm() throws Exception {
@@ -86,19 +90,56 @@ class OwnerControllerXmlConfigTest {
 	}
 
 	@Nested
+	@DisplayName("Test new Owner creation processing - ")
+	@SpringJUnitWebConfig(locations = {
+			"classpath:spring/mvc-test-config.xml", 
+			"classpath:spring/mvc-core-config.xml"})
+	class CreationFormProcessingTest {
+		
+		@Test
+		void testProcessCreationFormWithValidOwner() throws Exception {
+			
+			// Given
+			final String firstName = "Bill";
+			final String lastName = "Gates";
+			final String address = "852 Place Simon";
+			final String city = "Montreal";
+			final String telephone = "1234567890";
+			final int id = 123;
+			
+			Owner savedOwner = new Owner();
+			savedOwner.setId(1);
+			willAnswer(i -> {
+				Owner owner = (Owner) i.getArgument(0);
+				owner.setId(id);
+				return owner;
+			}).given(service).saveOwner(any(Owner.class));
+			
+			// When
+			mockMvc.perform(post("/owners/new")
+						.param("firstName", firstName)
+						.param("lastName", lastName)
+						.param("address", address)
+						.param("city", city)
+						.param("telephone", telephone))
+					.andExpect(status().is3xxRedirection())
+					.andExpect(redirectedUrl("/owners/" + id));
+			
+			// Then
+			then(service).should().saveOwner(ownerArgCaptor.capture());
+			assertThat(ownerArgCaptor.getValue().getId())
+					.as("Owner id should be %d.", id)
+					.isEqualTo(id);
+		}
+		
+	}//: End of CreationFormProcessingTest
+	
+	@Nested
 	@DisplayName("Test how Find-Form is processed - ")
 	@SpringJUnitWebConfig(locations = {
 			"classpath:spring/mvc-test-config.xml", 
 			"classpath:spring/mvc-core-config.xml"})
 	class FindFormProcessingTest {
-		
-		@Captor
-		private ArgumentCaptor<String> strArgCaptor;
-		
-		@AfterEach
-		void tearDown() {
-			reset(service);
-		}
 		
 		@DisplayName("Should go back to findOwners view if owner's name is not found - ")
 		@Test
@@ -121,8 +162,8 @@ class OwnerControllerXmlConfigTest {
 					.andExpect(view().name("owners/findOwners"));
 			
 			// Then
-			then(service).should().findOwnerByLastName(this.strArgCaptor.capture());
-			assertThat(this.strArgCaptor.getValue()).as("Should search '%s'.", lastName)
+			then(service).should().findOwnerByLastName(strArgCaptor.capture());
+			assertThat(strArgCaptor.getValue()).as("Should search '%s'.", lastName)
 					.isEqualTo(lastName);
 		}
 		
@@ -140,8 +181,8 @@ class OwnerControllerXmlConfigTest {
 					.andExpect(status().isOk())
 					.andExpect(view().name("owners/findOwners"));
 			
-			then(service).should().findOwnerByLastName(this.strArgCaptor.capture());
-			assertThat(this.strArgCaptor.getValue()).as("Should search empty string.")
+			then(service).should().findOwnerByLastName(strArgCaptor.capture());
+			assertThat(strArgCaptor.getValue()).as("Should search empty string.")
 					.isEqualTo("");
 		}
 		
@@ -165,8 +206,8 @@ class OwnerControllerXmlConfigTest {
 					.andExpect(status().is3xxRedirection());
 			
 			// Then
-			then(service).should().findOwnerByLastName(this.strArgCaptor.capture());
-			assertThat(this.strArgCaptor.getValue()).as("Should search '%s'.", lastName)
+			then(service).should().findOwnerByLastName(strArgCaptor.capture());
+			assertThat(strArgCaptor.getValue()).as("Should search '%s'.", lastName)
 					.isEqualTo(lastName);
 		}
 		
@@ -186,8 +227,8 @@ class OwnerControllerXmlConfigTest {
 					.andExpect(status().isOk());
 			
 			// Then
-			then(service).should().findOwnerByLastName(this.strArgCaptor.capture());
-			assertThat(this.strArgCaptor.getValue()).as("Should search '%s'.", lastName)
+			then(service).should().findOwnerByLastName(strArgCaptor.capture());
+			assertThat(strArgCaptor.getValue()).as("Should search '%s'.", lastName)
 					.isEqualTo(lastName);
 		}
 		
