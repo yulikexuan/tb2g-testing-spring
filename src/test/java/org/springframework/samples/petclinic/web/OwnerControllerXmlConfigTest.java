@@ -90,6 +90,65 @@ class OwnerControllerXmlConfigTest {
 	}
 
 	@Nested
+	@DisplayName("Test Owner Update Form Processing - ")
+	@SpringJUnitWebConfig(locations = {
+			"classpath:spring/mvc-test-config.xml", 
+			"classpath:spring/mvc-core-config.xml"})
+	class UpdateFormProcessingTest {
+		
+		@Test
+		@DisplayName("Able to update an valid Owner - ")
+		void testProcessUpdateOwnerFormWithValidOwner() throws Exception {
+			
+			// Given
+			final String firstName = "Bill";
+			final String lastName = "Gates";
+			final String address = "852 Place Simon";
+			final String city = "Montreal";
+			final String telephone = "1234567890";
+			final int id = 123;
+			
+			// When
+			mockMvc.perform(post("/owners/" + id + "/edit")
+							.param("firstName", firstName)
+							.param("lastName", lastName)
+							.param("address", address)
+							.param("city", city)
+							.param("telephone", telephone))
+					.andExpect(status().is3xxRedirection())
+					.andExpect(redirectedUrl("/owners/" + id));
+			
+			// Then
+			then(service).should().saveOwner(ownerArgCaptor.capture());
+			assertThat(ownerArgCaptor.getValue().getId())
+					.as("The updated owner's id should be %d.", id)
+					.isEqualTo(id);
+		}
+		
+		@Test
+		@DisplayName("Not able to update an invalid Owner - ")
+		void testProcessUpdateOwnerFormWithInvalidOwner() throws Exception {
+			
+			// Given
+			final String firstName = "Bill";
+			final String lastName = "Gates";
+			final String city = "Montreal";
+			final int id = 123;
+			
+			// When
+			mockMvc.perform(post("/owners/" + id + "/edit")
+							.param("firstName", firstName)
+							.param("lastName", lastName)
+							.param("city", city))
+					.andExpect(model().attributeHasErrors("owner"))
+					.andExpect(model().attributeHasFieldErrors("owner", "address"))
+					.andExpect(model().attributeHasFieldErrors("owner", "telephone"))
+					.andExpect(status().isOk());
+		}
+		
+	}//: End of UpdateFormProcessingTest 
+	
+	@Nested
 	@DisplayName("Test new Owner creation processing - ")
 	@SpringJUnitWebConfig(locations = {
 			"classpath:spring/mvc-test-config.xml", 
