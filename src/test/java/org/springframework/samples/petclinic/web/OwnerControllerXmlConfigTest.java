@@ -96,6 +96,7 @@ class OwnerControllerXmlConfigTest {
 			"classpath:spring/mvc-core-config.xml"})
 	class CreationFormProcessingTest {
 		
+		@DisplayName("Able to save a new Owner from form - ")
 		@Test
 		void testProcessCreationFormWithValidOwner() throws Exception {
 			
@@ -117,11 +118,11 @@ class OwnerControllerXmlConfigTest {
 			
 			// When
 			mockMvc.perform(post("/owners/new")
-						.param("firstName", firstName)
-						.param("lastName", lastName)
-						.param("address", address)
-						.param("city", city)
-						.param("telephone", telephone))
+							.param("firstName", firstName)
+							.param("lastName", lastName)
+							.param("address", address)
+							.param("city", city)
+							.param("telephone", telephone))
 					.andExpect(status().is3xxRedirection())
 					.andExpect(redirectedUrl("/owners/" + id));
 			
@@ -130,6 +131,31 @@ class OwnerControllerXmlConfigTest {
 			assertThat(ownerArgCaptor.getValue().getId())
 					.as("Owner id should be %d.", id)
 					.isEqualTo(id);
+		}
+		
+		@DisplayName("Not able to save a invalid Owner from form - ")
+		@Test
+		void testProcessCreationFormWithInvalidOwner() throws Exception {
+			
+			// Given
+			final String firstName = "Bill";
+			final String lastName = "Gates";
+			final String city = "Montreal";
+			
+			// When
+			mockMvc.perform(post("/owners/new")
+							.param("firstName", firstName)
+							.param("lastName", lastName)
+							.param("city", city))
+					.andExpect(model().attributeHasErrors("owner"))
+					.andExpect(model().attributeHasFieldErrors("owner", "address"))
+					.andExpect(model().attributeHasFieldErrors("owner", "telephone"))
+					.andExpect(status().isOk())
+					.andExpect(view().name(
+							OwnerController.VIEWS_OWNER_CREATE_OR_UPDATE_FORM));
+			
+			// Then
+			then(service).should(never()).saveOwner(any(Owner.class));
 		}
 		
 	}//: End of CreationFormProcessingTest
